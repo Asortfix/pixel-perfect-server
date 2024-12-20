@@ -1,11 +1,6 @@
 import React from 'react';
 
-interface ControlPanelProps {
-  score: number;
-  objectCount: number;
-}
-
-const ControlPanel: React.FC<ControlPanelProps> = ({ score, objectCount }) => {
+const ControlPanel: React.FC = () => {
   return (
     <div style={{
       width: '20%',
@@ -21,8 +16,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ score, objectCount }) => {
       </div>
       <div style={{ marginBottom: '20px' }}>
         <h2>Player Info</h2>
-        <p><strong>Score:</strong> {score}</p>
-        <p><strong>Objects Placed:</strong> {objectCount}</p>
+        <p><strong>Score:</strong> 1230</p>
+        <p><strong>Objects Placed:</strong> 5</p>
       </div>
       <div style={{ marginBottom: '20px' }}>
         <h2>Controls</h2>
