@@ -18,10 +18,10 @@ function App() {
     diamond: { src: diamondSrc, image: new Image() },
     emerald: { src: emeraldSrc, image: new Image() },
     ruby: { src: rubySrc, image: new Image() },
-    black: { src: blackGemSrc, image: new Image() },
-    orange: { src: orangeGemSrc, image: new Image() },
-    pink: { src: pinkGemSrc, image: new Image() },
-    purple: { src: purpleGemSrc, image: new Image() },
+    // black: { src: blackGemSrc, image: new Image() },
+    // orange: { src: orangeGemSrc, image: new Image() },
+    // pink: { src: pinkGemSrc, image: new Image() },
+    // purple: { src: purpleGemSrc, image: new Image() },
     yellow: { src: yellowGemSrc, image: new Image() },
   });
 
