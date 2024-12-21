@@ -32,7 +32,7 @@ const CanvasView: React.FC<CanvasViewProps> = ({
   // Load background image
   useEffect(() => {
     const bgImage = new Image();
-    bgImage.src = '/background.png';
+    bgImage.src = '/images/background.png';
     bgImage.onload = () => setBackgroundImage(bgImage);
   }, []);
 
