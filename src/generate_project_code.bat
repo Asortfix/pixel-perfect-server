@@ -6,9 +6,13 @@ set tempFile=%temp%\project_code.txt
 if exist "%tempFile%" del "%tempFile%"
 
 :: Собираем структуру проекта
+setlocal enabledelayedexpansion
 echo ===== Project Structure ===== > "%tempFile%"
-for /f "delims=" %%d in ('dir /ad /b /s ^| findstr /i /v "\\node_modules\\"') do (
-    echo %%d >> "%tempFile%"
+for /f "delims=" %%d in ('dir /s /b /ad ^| findstr /i /v "\\node_modules\\"') do (
+    echo Folder: %%d >> "%tempFile%"
+    for /f "delims=" %%f in ('dir "%%d" /b /a-d ^| findstr /i /v "\\node_modules\\"') do (
+        echo    File: %%f >> "%tempFile%"
+    )
 )
 
 :: Добавляем разделитель
@@ -32,5 +36,5 @@ type "%tempFile%" | clip
 del "%tempFile%"
 
 :: Сообщаем об успешном завершении
-echo Project code and structure have been copied to clipboard.
+echo Project structure and code have been copied to clipboard.
 pause
