@@ -8,21 +8,29 @@ interface CanvasViewProps {
 const CanvasView: React.FC<CanvasViewProps> = ({ images }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [objects, setObjects] = useState<Gem[]>([]);
-  const [masks, setMasks] = useState<{[key: string]: {x:number,y:number}[]}>({});
+  const [masks, setMasks] = useState<{ [key: string]: { x: number; y: number }[] }>({});
+  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
+    // Preload the background image
+    const bgImage = new Image();
+    bgImage.src = '/background.png'; // Reference the image in the public folder
+    bgImage.onload = () => setBackgroundImage(bgImage);
+  }, []);
+
+  useEffect(() => {
     // Once images are loaded, create masks
-    const loadedMasks: {[key: string]: {x:number,y:number}[]} = {};
+    const loadedMasks: { [key: string]: { x: number; y: number }[] } = {};
     for (let key in images) {
       loadedMasks[key] = createMask(images[key].image, OBJ_WIDTH, OBJ_HEIGHT);
     }
     setMasks(loadedMasks);
   }, [images]);
- 
+
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || Object.keys(masks).length === 0) return;
+    if (!canvas || Object.keys(masks).length === 0 || !backgroundImage) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -38,7 +46,10 @@ const CanvasView: React.FC<CanvasViewProps> = ({ images }) => {
     const animate = () => {
       const { width, height } = canvas;
       ctx.clearRect(0, 0, width, height);
-      
+
+      // Draw background
+      ctx.drawImage(backgroundImage, 0, 0, width, height);
+
       // Draw floor and walls
       drawBoundaries(ctx, width, height);
 
@@ -51,6 +62,7 @@ const CanvasView: React.FC<CanvasViewProps> = ({ images }) => {
       objects.forEach(obj => {
         obj.draw(ctx);
       });
+
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
@@ -61,13 +73,12 @@ const CanvasView: React.FC<CanvasViewProps> = ({ images }) => {
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [masks, objects]);
+  }, [masks, objects, backgroundImage]);
 
   const placeObject = (x: number, y: number) => {
     const keys = Object.keys(images);
     const choice = keys[Math.floor(Math.random() * keys.length)];
     const newObj = new Gem(x, y, images[choice].image, masks[choice]);
-    // Adjust position if collides
     let attempts = 100;
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -82,11 +93,11 @@ const CanvasView: React.FC<CanvasViewProps> = ({ images }) => {
   };
 
   return (
-    <canvas 
-      ref={canvasRef} 
-      width={window.innerWidth * 0.8} 
-      height={window.innerHeight} 
-      style={{display: 'block', backgroundColor: '#f0f0f0'}} 
+    <canvas
+      ref={canvasRef}
+      width={window.innerWidth * 0.8}
+      height={window.innerHeight}
+      style={{ display: 'block', backgroundColor: '#f0f0f0' }}
     />
   );
 };

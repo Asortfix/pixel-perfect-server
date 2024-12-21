@@ -1,7 +1,7 @@
 export const OBJ_WIDTH = 50;
 export const OBJ_HEIGHT = 50;
 export const gravity = 0.5;
-export const floorHeight = 20;
+export const floorHeight = 15;
 export const wallThickness = 20;
 
 export interface MaskPixel {
