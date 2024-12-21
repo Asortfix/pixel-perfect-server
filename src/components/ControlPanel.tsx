@@ -1,40 +1,62 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-const ControlPanel: React.FC = () => {
-  const [panelImage, setPanelImage] = useState<HTMLImageElement | null>(null);
+interface ControlPanelProps {
+  score: number;
+  objectsPlaced: number;
+  onReset: () => void;
+}
 
-  useEffect(() => {
-    // Preload the panel background image
-    const img = new Image();
-    img.src = '/control-panel-bg.png'; // Replace with your image path in the public folder
-    img.onload = () => setPanelImage(img);
-  }, []);
-
+const ControlPanel: React.FC<ControlPanelProps> = ({
+  score,
+  objectsPlaced,
+  onReset,
+}) => {
   return (
     <div
       style={{
         width: '20%',
-        background: panelImage ? `url('${panelImage.src}') no-repeat center/cover` : '#333',
+        background: '#333',
         color: '#fff',
         padding: '20px',
         boxSizing: 'border-box',
       }}
     >
-      <h1 style={{ fontSize: '18px', marginTop: 0 }}>Game Panel</h1>
+      <h1
+        style={{
+          fontSize: '24px',
+          margin: 0,
+          textShadow: '2px 2px 0 #000',
+        }}
+      >
+        Game Panel
+      </h1>
       <div style={{ marginBottom: '20px' }}>
-        <h2>Instructions</h2>
-        <p>Click inside the canvas area to place a gem. Gems will fall and stack.</p>
+        <h2 style={{ textShadow: '2px 2px 0 #000' }}>Score</h2>
+        <p style={{ fontSize: '18px', margin: '10px 0', textShadow: '1px 1px 0 #000' }}>
+          {score}
+        </p>
       </div>
       <div style={{ marginBottom: '20px' }}>
-        <h2>Player Info</h2>
-        <p><strong>Score:</strong> 1230</p>
-        <p><strong>Objects Placed:</strong> 5</p>
+        <h2 style={{ textShadow: '2px 2px 0 #000' }}>Objects Placed</h2>
+        <p style={{ fontSize: '18px', margin: '10px 0', textShadow: '1px 1px 0 #000' }}>
+          {objectsPlaced}
+        </p>
       </div>
-      <div style={{ marginBottom: '20px' }}>
-        <h2>Controls</h2>
-        <p>Click: Place an object</p>
-        <p>More controls to come...</p>
-      </div>
+      <button
+        onClick={onReset}
+        style={{
+          padding: '10px',
+          fontSize: '16px',
+          backgroundColor: '#ff9900',
+          color: '#000',
+          border: 'none',
+          cursor: 'pointer',
+          textShadow: '1px 1px 0 #fff',
+          fontWeight: 'bold',
+        }}
+      >
+        Reset Game
+      </button>
     </div>
   );
 };

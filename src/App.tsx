@@ -3,9 +3,6 @@ import ControlPanel from './components/ControlPanel';
 import CanvasView from './components/CanvasView';
 import { Images } from './game/GameLogic';
 
-// Example image imports: 
-// Make sure these images are accessible (if placed in public folder, you can just reference '/diamond.png', etc.)
-// If imported directly, ensure the bundler handles them correctly.
 const diamondSrc = '/diamond.png';
 const emeraldSrc = '/emerald.png';
 const rubySrc = '/ruby.png';
@@ -14,14 +11,21 @@ function App() {
   const [images, setImages] = useState<Images>({
     diamond: { src: diamondSrc, image: new Image() },
     emerald: { src: emeraldSrc, image: new Image() },
-    ruby: { src: rubySrc, image: new Image() }
+    ruby: { src: rubySrc, image: new Image() },
   });
-  const [loaded, setLoaded] = useState(false);
 
+  const [loaded, setLoaded] = useState(false);
+  const [score, setScore] = useState(0);
+  const [objectsPlaced, setObjectsPlaced] = useState(0);
+
+  // This state controls reset logic
+  const [shouldReset, setShouldReset] = useState(false);
+
+  // Preload images
   useEffect(() => {
     let count = 0;
     const keys = Object.keys(images);
-    keys.forEach(key => {
+    keys.forEach((key) => {
       images[key].image.src = images[key].src;
       images[key].image.onload = () => {
         count++;
@@ -32,11 +36,57 @@ function App() {
     });
   }, [images]);
 
+  /**
+   * Called by CanvasView every time an object is successfully placed
+   */
+  const handleObjectPlaced = (points: number) => {
+    setScore((prev) => prev + points);
+    setObjectsPlaced((prev) => prev + 1);
+  };
+
+  /**
+   * Reset game state and trigger CanvasView to clear objects
+   */
+  const resetGame = () => {
+    setScore(0);
+    setObjectsPlaced(0);
+    setShouldReset(true); // Triggers reset in CanvasView
+  };
+
+  /**
+   * Called by CanvasView once it finishes resetting
+   */
+  const handleResetComplete = () => {
+    setShouldReset(false);
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', width: '100vw', height: '100vh', overflow: 'hidden', backgroundColor: '#f0f0f0' }}>
-      <ControlPanel />
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden',
+        backgroundColor: '#f0f0f0',
+      }}
+    >
+      <ControlPanel
+        score={score}
+        objectsPlaced={objectsPlaced}
+        onReset={resetGame}
+      />
       <div style={{ width: '80%', position: 'relative' }}>
-        {loaded ? <CanvasView images={images} /> : <div>Loading...</div>}
+        {loaded ? (
+          <CanvasView
+            images={images}
+            onObjectPlaced={handleObjectPlaced}
+            shouldReset={shouldReset}
+            onResetComplete={handleResetComplete}
+          />
+        ) : (
+          <div>Loading...</div>
+        )}
       </div>
     </div>
   );
