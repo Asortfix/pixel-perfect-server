@@ -12,8 +12,8 @@ import {
 interface CanvasViewProps {
   images: Images;
   onObjectPlaced: (points: number) => void;
-  shouldReset: boolean; // New prop to trigger reset
-  onResetComplete: () => void; // Callback to tell App the reset is done
+  shouldReset: boolean; // Reset state
+  onResetComplete: () => void; // Callback for reset
 }
 
 const CanvasView: React.FC<CanvasViewProps> = ({
@@ -29,14 +29,14 @@ const CanvasView: React.FC<CanvasViewProps> = ({
 
   const animationFrameRef = useRef<number | null>(null);
 
-  /** Preload background once to avoid blinking */
+  // Load background image
   useEffect(() => {
     const bgImage = new Image();
-    bgImage.src = '/background.png'; // or wherever your background image is
+    bgImage.src = '/background.png';
     bgImage.onload = () => setBackgroundImage(bgImage);
   }, []);
 
-  /** Create masks once images are fully loaded */
+  // Load gem masks
   useEffect(() => {
     const loadedMasks: { [key: string]: { x: number; y: number }[] } = {};
     for (let key in images) {
@@ -45,20 +45,21 @@ const CanvasView: React.FC<CanvasViewProps> = ({
     setMasks(loadedMasks);
   }, [images]);
 
-  /**
-   *  Watch for `shouldReset`.
-   *  If true, clear the objects array, then notify App that reset is done.
-   */
+  // Watch for reset state
   useEffect(() => {
     if (shouldReset) {
       setObjects([]);
-      onResetComplete(); 
+      onResetComplete();
     }
   }, [shouldReset, onResetComplete]);
 
-  /**
-   *  Main animation loop
-   */
+  // Sound Effect
+  const playGemAppearSound = () => {
+    const audio = new Audio('/sounds/gem-appear.mp3'); // Path to your sound file
+    audio.play();
+  };
+
+  // Animation loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !backgroundImage || !Object.keys(masks).length) return;
@@ -79,10 +80,9 @@ const CanvasView: React.FC<CanvasViewProps> = ({
       if (!ctx || !backgroundImage) return;
 
       const { width, height } = canvas;
-      // Clear screen
       ctx.clearRect(0, 0, width, height);
 
-      // Draw background once loaded
+      // Draw background
       ctx.drawImage(backgroundImage, 0, 0, width, height);
 
       // Draw floor and walls
@@ -98,7 +98,6 @@ const CanvasView: React.FC<CanvasViewProps> = ({
         obj.draw(ctx);
       });
 
-      // Request next frame
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
@@ -113,9 +112,7 @@ const CanvasView: React.FC<CanvasViewProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [masks, objects, backgroundImage]);
 
-  /**
-   * Creates a new Gem and adds it to the objects array
-   */
+  // Place a new gem and play sound
   const placeObject = (x: number, y: number) => {
     const keys = Object.keys(images);
     const choice = keys[Math.floor(Math.random() * keys.length)];
@@ -135,7 +132,8 @@ const CanvasView: React.FC<CanvasViewProps> = ({
 
     if (attempts > 0) {
       setObjects((prev) => [...prev, newObj]);
-      onObjectPlaced(10); // e.g., +10 points
+      onObjectPlaced(10); // Award points
+      playGemAppearSound(); // Play sound effect
     }
   };
 
@@ -151,9 +149,7 @@ const CanvasView: React.FC<CanvasViewProps> = ({
 
 function drawBoundaries(ctx: CanvasRenderingContext2D, width: number, height: number) {
   ctx.fillStyle = '#666';
-  // Floor
   ctx.fillRect(0, height - floorHeight, width, floorHeight);
-  // Walls
   ctx.fillRect(0, 0, wallThickness, height);
   ctx.fillRect(width - wallThickness, 0, wallThickness, height);
 }
